@@ -25,6 +25,7 @@ struct pt {
   jmp_buf env;
   int isset;
   int status;
+  void *local;
 };
 #define pt_init()                                                              \
   { .isset = 0, .status = 0 }
@@ -53,6 +54,7 @@ struct pt {
 struct pt {
   void *label;
   int status;
+  void *local;
 };
 #define pt_init()                                                              \
   { .label = NULL, .status = 0 }
@@ -84,6 +86,7 @@ struct pt {
 struct pt {
   int label;
   int status;
+  void *local;
 };
 #define pt_init()                                                              \
   { .label = 0, .status = 0 }
