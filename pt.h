@@ -28,6 +28,8 @@ struct pt {
 };
 #define pt_init()                                                              \
   { .isset = 0, .status = 0 }
+#define pt_reset(pt)                                                           \
+  do { (pt)->isset = 0; (pt)->status = 0; } while (0)
 #define pt_begin(pt)                                                           \
   do {                                                                         \
     if ((pt)->isset) {                                                         \
@@ -54,6 +56,10 @@ struct pt {
 };
 #define pt_init()                                                              \
   { .label = NULL, .status = 0 }
+#define pt_reset(pt)                                                           \
+  do { (pt)->label = NULL; (pt)->status = 0; } while (0)
+#define pt_restart(pt)                                                         \
+  do { pt_reset(pt); return; } while (0)
 #define pt_begin(pt)                                                           \
   do {                                                                         \
     if ((pt)->label != NULL) {                                                 \
@@ -81,6 +87,8 @@ struct pt {
 };
 #define pt_init()                                                              \
   { .label = 0, .status = 0 }
+#define pt_reset(pt)                                                           \
+  do { (pt)->label = 0; (pt)->status = 0; } while (0)
 #define pt_begin(pt)                                                           \
   switch ((pt)->label) {                                                       \
   case 0:
