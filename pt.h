@@ -35,6 +35,9 @@ typedef struct pt pt_t;
   do { (pt)->isset = 0; (pt)->status = 0; } while (0)
 #define pt_begin(pt)                                                           \
   do {                                                                         \
+    if ((pt)->status == PT_STATUS_FINISHED) {                                  \
+      return;                                                                  \
+    }                                                                          \
     if ((pt)->isset) {                                                         \
       longjmp((pt)->env, 0);                                                   \
     }                                                                          \
@@ -46,6 +49,11 @@ typedef struct pt pt_t;
     setjmp((pt)->env);                                                         \
   } while (0)
 #define pt_end(pt) pt_label(pt, PT_STATUS_FINISHED)
+#define pt_kill(pt)                                                            \
+  do {                                                                         \
+    (pt)->isset = 1;                                                           \
+    (pt)->status = PT_STATUS_FINISHED;                                         \
+  } while (0)
 #elif PT_USE_GOTO
 /*
  * Local continuation based on goto label references.
@@ -68,17 +76,23 @@ typedef struct pt pt_t;
   do { pt_reset(pt); return; } while (0)
 #define pt_begin(pt)                                                           \
   do {                                                                         \
+    if ((pt)->status == PT_STATUS_FINISHED) {                                  \
+      return;                                                                  \
+    }                                                                          \
     if ((pt)->label != NULL) {                                                 \
       goto *(pt)->label;                                                       \
     }                                                                          \
   } while (0)
-
 #define pt_label(pt, stat)                                                     \
   do {                                                                         \
     (pt)->status = (stat);                                                     \
     _pt_line(label) : (pt)->label = &&_pt_line(label);                         \
   } while (0)
 #define pt_end(pt) pt_label(pt, PT_STATUS_FINISHED)
+#define pt_kill(pt)                                                            \
+  do {                                                                         \
+    (pt)->status = PT_STATUS_FINISHED;                                         \
+  } while (0)
 #else
 /*
  * Local continuation based on switch/case and line numbers.
@@ -99,6 +113,9 @@ typedef struct pt pt_t;
 #define pt_reset(pt)                                                           \
   do { (pt)->label = 0; (pt)->status = 0; } while (0)
 #define pt_begin(pt)                                                           \
+  if ((pt)->status == PT_STATUS_FINISHED) {                                    \
+    return;                                                                    \
+  }                                                                            \
   switch ((pt)->label) {                                                       \
   case 0:
 #define pt_label(pt, stat)                                                     \
@@ -110,6 +127,10 @@ typedef struct pt pt_t;
 #define pt_end(pt)                                                             \
   pt_label(pt, PT_STATUS_FINISHED);                                            \
   }
+#define pt_kill(pt)                                                            \
+  do {                                                                         \
+    (pt)->status = PT_STATUS_FINISHED;                                         \
+  } while (0)
 #endif
 
 /*
