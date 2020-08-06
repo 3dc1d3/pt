@@ -27,6 +27,8 @@ struct pt {
   int status;
   void *local;
 };
+typedef struct pt pt_t;
+
 #define pt_init()                                                              \
   { .isset = 0, .status = 0 }
 #define pt_reset(pt)                                                           \
@@ -56,6 +58,8 @@ struct pt {
   int status;
   void *local;
 };
+typedef struct pt pt_t;
+
 #define pt_init()                                                              \
   { .label = NULL, .status = 0 }
 #define pt_reset(pt)                                                           \
@@ -88,6 +92,8 @@ struct pt {
   int status;
   void *local;
 };
+typedef struct pt pt_t;
+
 #define pt_init()                                                              \
   { .label = 0, .status = 0 }
 #define pt_reset(pt)                                                           \
